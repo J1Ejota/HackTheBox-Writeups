@@ -34,3 +34,15 @@ This repository is for **educational purposes only**. Use of any techniques or s
 ---
 
 ## 📝 License
+
+This repository is licensed under the **Creative Commons Attribution 4.0 International (CC BY 4.0)** license.
+
+You are free to:
+
+- Share — copy and redistribute the material in any medium or format
+- Adapt — remix, transform, and build upon the material for any purpose, even commercially
+
+**As long as** you give **appropriate credit** to the author:  
+[`@J1Ejota`](https://github.com/J1Ejota)
+
+🔗 Full license text: [https://creativecommons.org/licenses/by/4.0/](https://creativecommons.org/licenses/by/4.0/)
